@@ -1,0 +1,48 @@
+// Tipos de la entrevista (se usan en el servidor y en el navegador).
+
+export const QUESTION_TYPES = {
+  apertura: "Apertura",
+  tecnica: "Técnica",
+  comportamiento: "Comportamiento",
+  situacional: "Situacional",
+  cierre: "Cierre",
+} as const;
+
+export type QuestionType = keyof typeof QUESTION_TYPES;
+
+export type PlannedQuestion = {
+  id: number;
+  tipo: QuestionType;
+  pregunta: string; // Lo que la IA dirá en voz alta
+  objetivo: string; // Qué quiere evaluar con la pregunta
+  senales: string[]; // Qué esperaría escuchar en una buena respuesta
+};
+
+export type InterviewPlan = {
+  puesto: string;
+  nivel: string;
+  oferta: string | null;
+  entrevistador: string; // Nombre del entrevistador virtual
+  saludo: string;
+  resumen_candidato: string;
+  fortalezas: string[];
+  brechas: string[];
+  preguntas: PlannedQuestion[];
+};
+
+export const LENGTHS = [
+  { value: "corta", label: "Corta", questions: 4, hint: "~10 min" },
+  { value: "normal", label: "Normal", questions: 6, hint: "~15 min" },
+  { value: "larga", label: "Larga", questions: 8, hint: "~25 min" },
+] as const;
+
+export type InterviewLength = (typeof LENGTHS)[number]["value"];
+
+export type InterviewRow = {
+  id: string;
+  job_title: string;
+  level: string | null;
+  plan: InterviewPlan | null;
+  status: "pendiente" | "en_curso" | "terminada";
+  created_at: string;
+};
