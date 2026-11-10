@@ -43,6 +43,9 @@ create table if not exists public.feedback (
   strengths jsonb,
   improvements jsonb,
   per_question jsonb,
+  verdict text,
+  summary text,
+  next_steps jsonb,
   created_at timestamptz not null default now()
 );
 

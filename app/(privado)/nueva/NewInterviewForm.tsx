@@ -8,7 +8,7 @@ import { createInterview, type NewInterviewState } from "./actions";
 const optionCard =
   "cursor-pointer rounded-xl border border-zinc-300 p-3 transition has-checked:border-indigo-500 has-checked:bg-indigo-50 dark:border-zinc-700 dark:has-checked:bg-indigo-950/40";
 
-export function NewInterviewForm({ level }: { level: Level | null }) {
+export function NewInterviewForm({ level, puesto }: { level: Level | null; puesto: string }) {
   const [state, formAction, pending] = useActionState<NewInterviewState, FormData>(
     createInterview,
     {},
@@ -20,6 +20,7 @@ export function NewInterviewForm({ level }: { level: Level | null }) {
         <span className="font-medium">Puesto al que aplicas</span>
         <input
           name="puesto"
+          defaultValue={puesto}
           required
           minLength={3}
           maxLength={120}

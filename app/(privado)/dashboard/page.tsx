@@ -45,6 +45,9 @@ async function InterviewList() {
     <ul className="flex flex-col gap-3">
       {interviews.map((it) => {
         const status = STATUS[it.status];
+        // Supabase devuelve la relación 1 a 1 como objeto (o arreglo según la versión).
+        const fb = Array.isArray(it.feedback) ? it.feedback[0] : it.feedback;
+        const score: number | undefined = fb?.overall_score;
         const href = it.status === "terminada" ? `/resultado/${it.id}` : `/entrevista/${it.id}`;
         return (
           <li key={it.id}>
@@ -59,9 +62,21 @@ async function InterviewList() {
                   {new Date(it.created_at).toLocaleDateString("es")}
                 </p>
               </div>
-              <span className={`rounded-full px-3 py-1 text-xs font-medium ${status.className}`}>
-                {status.label}
-              </span>
+              <div className="flex items-center gap-3">
+                {score !== undefined && (
+                  <span
+                    className={`text-lg font-bold tabular-nums ${
+                      score >= 80 ? "text-emerald-600" : score >= 60 ? "text-amber-600" : "text-red-600"
+                    }`}
+                  >
+                    {score}
+                    <span className="text-xs font-normal text-zinc-500">/100</span>
+                  </span>
+                )}
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${status.className}`}>
+                  {status.label}
+                </span>
+              </div>
             </Link>
           </li>
         );

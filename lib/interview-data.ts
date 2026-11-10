@@ -1,5 +1,5 @@
 import "server-only";
-import type { InterviewRow } from "@/lib/interview";
+import type { FeedbackRow, InterviewRow, Turn } from "@/lib/interview";
 import { createClient } from "@/lib/supabase/server";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -17,14 +17,38 @@ export async function getInterview(id: string) {
   return data;
 }
 
+export type InterviewListItem = InterviewRow & { feedback: { overall_score: number } | null };
+
 export async function listInterviews() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("interviews")
-    .select("id, job_title, level, plan, status, created_at")
+    .select("id, job_title, level, plan, status, created_at, feedback(overall_score)")
     .order("created_at", { ascending: false })
     .limit(50)
-    .returns<InterviewRow[]>();
+    .returns<InterviewListItem[]>();
   if (error) console.error("Error listando entrevistas:", error.message);
   return data ?? [];
+}
+
+export async function getTurns(interviewId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("turns")
+    .select("role, content, position, question_id, kind")
+    .eq("interview_id", interviewId)
+    .order("position")
+    .returns<Turn[]>();
+  return data ?? [];
+}
+
+export async function getFeedback(interviewId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("feedback")
+    .select("*")
+    .eq("interview_id", interviewId)
+    .maybeSingle<FeedbackRow>();
+  if (error) console.error("Error leyendo el feedback:", error.message);
+  return data;
 }

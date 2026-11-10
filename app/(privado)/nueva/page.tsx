@@ -3,7 +3,10 @@ import { Suspense } from "react";
 import { getProfile } from "@/lib/profile";
 import { NewInterviewForm } from "./NewInterviewForm";
 
-export default function NuevaPage() {
+// Preparar el plan con IA tarda ~20 s (aplica a la Server Action de esta página).
+export const maxDuration = 60;
+
+export default function NuevaPage(props: PageProps<"/nueva">) {
   return (
     <section className="flex flex-col gap-6">
       <div>
@@ -13,14 +16,14 @@ export default function NuevaPage() {
         </p>
       </div>
       <Suspense fallback={<p className="text-zinc-500">Cargando…</p>}>
-        <FormLoader />
+        <FormLoader searchParams={props.searchParams} />
       </Suspense>
     </section>
   );
 }
 
-async function FormLoader() {
-  const { profile } = await getProfile();
+async function FormLoader({ searchParams }: { searchParams: PageProps<"/nueva">["searchParams"] }) {
+  const [{ profile }, { puesto }] = await Promise.all([getProfile(), searchParams]);
 
   if (!profile?.cv_text) {
     return (
@@ -39,5 +42,7 @@ async function FormLoader() {
     );
   }
 
-  return <NewInterviewForm level={profile.level} />;
+  return (
+    <NewInterviewForm level={profile.level} puesto={typeof puesto === "string" ? puesto.slice(0, 120) : ""} />
+  );
 }
