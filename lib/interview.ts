@@ -46,3 +46,22 @@ export type InterviewRow = {
   status: "pendiente" | "en_curso" | "terminada";
   created_at: string;
 };
+
+export type TurnKind = "saludo" | "pregunta" | "repregunta" | "aclaracion" | "respuesta" | "despedida";
+
+export type Turn = {
+  role: "ia" | "usuario";
+  content: string;
+  position: number;
+  question_id: number | null;
+  kind: TurnKind | null;
+};
+
+// Lo que devuelve /api/turn al navegador.
+export type TurnResponse = {
+  say: string; // Lo que la IA dice en voz alta
+  kind: TurnKind;
+  questionNumber: number; // 1..total (0 en el saludo)
+  totalQuestions: number;
+  done: boolean;
+};

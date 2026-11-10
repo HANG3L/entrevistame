@@ -60,12 +60,16 @@ async function Briefing({ params }: { params: PageProps<"/entrevista/[id]">["par
           <li>Busca un lugar tranquilo; mejor si usas audífonos.</li>
           <li>Responde como en una entrevista real: la IA puede repreguntar sobre lo que digas.</li>
         </ul>
-        <button
-          disabled
-          className="mt-4 rounded-full bg-indigo-600 px-6 py-2.5 font-medium text-white opacity-60"
+        <Link
+          href={interview.status === "terminada" ? `/resultado/${interview.id}` : `/entrevista/${interview.id}/sala`}
+          className="mt-4 inline-block rounded-full bg-indigo-600 px-6 py-2.5 font-medium text-white hover:bg-indigo-700"
         >
-          Comenzar entrevista (fase 3)
-        </button>
+          {interview.status === "terminada"
+            ? "Ver resultado"
+            : interview.status === "en_curso"
+              ? "Continuar entrevista"
+              : "Comenzar entrevista"}
+        </Link>
       </div>
 
       <details className="text-sm">

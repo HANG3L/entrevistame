@@ -1,13 +1,22 @@
 import "server-only";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
+
+const unique = (list: string[]) => list.filter((m, i, all) => all.indexOf(m) === i);
 
 // Modelo principal (capa gratuita) y respaldos si está saturado o se llegó al límite.
-// Se puede cambiar el principal con GEMINI_MODEL en .env.local.
-const MODELS = [
+// Se usa para tareas que piden calidad: preparar el plan y dar el feedback.
+const MODELS = unique([
   process.env.GEMINI_MODEL ?? "gemini-3.5-flash",
   "gemini-3.8-flash",
   "gemini-3.5-flash-lite",
-].filter((m, i, all) => all.indexOf(m) === i);
+]);
+
+// Modelos rápidos (~1 s) para la conversación en vivo, donde importa la fluidez.
+const FAST_MODELS = unique([
+  process.env.GEMINI_FAST_MODEL ?? "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash",
+]);
 
 let client: GoogleGenAI | null = null;
 
@@ -36,13 +45,15 @@ type JsonOptions = {
   system?: string;
   schema?: unknown;
   temperature?: number;
+  /** Usa los modelos rápidos con razonamiento mínimo (para la conversación en vivo). */
+  fast?: boolean;
 };
 
 // Pide a Gemini una respuesta en JSON y la devuelve ya parseada.
 export async function generateJson<T>(prompt: string, opts: JsonOptions = {}): Promise<T> {
   let lastError: unknown;
 
-  for (const model of MODELS) {
+  for (const model of opts.fast ? FAST_MODELS : MODELS) {
     try {
       const res = await getGemini().models.generateContent({
         model,
@@ -50,6 +61,7 @@ export async function generateJson<T>(prompt: string, opts: JsonOptions = {}): P
         config: {
           systemInstruction: opts.system,
           temperature: opts.temperature,
+          ...(opts.fast ? { thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } } : {}),
           responseMimeType: "application/json",
           ...(opts.schema ? { responseJsonSchema: opts.schema } : {}),
         },

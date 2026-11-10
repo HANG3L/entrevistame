@@ -29,8 +29,12 @@ create table if not exists public.turns (
   role text not null check (role in ('ia', 'usuario')),
   content text not null,
   position int not null,
+  question_id int,
+  kind text check (kind in ('saludo', 'pregunta', 'repregunta', 'aclaracion', 'respuesta', 'despedida')),
   created_at timestamptz not null default now()
 );
+
+create index if not exists turns_interview_position_idx on public.turns (interview_id, position);
 
 create table if not exists public.feedback (
   interview_id uuid primary key references public.interviews (id) on delete cascade,
