@@ -3,94 +3,83 @@
 import { useActionState } from "react";
 import { LENGTHS } from "@/lib/interview";
 import { LEVELS, type Level } from "@/lib/levels";
+import { btnPrimary, input, optionCard } from "@/lib/ui";
 import { createInterview, type NewInterviewState } from "./actions";
 
-const optionCard =
-  "cursor-pointer rounded-xl border border-zinc-300 p-3 transition has-checked:border-indigo-500 has-checked:bg-indigo-50 dark:border-zinc-700 dark:has-checked:bg-indigo-950/40";
+const IDEAS = ["Pasante de marketing digital", "Desarrollador Frontend Jr", "Asistente contable", "Atención al cliente"];
 
 export function NewInterviewForm({ level, puesto }: { level: Level | null; puesto: string }) {
-  const [state, formAction, pending] = useActionState<NewInterviewState, FormData>(
-    createInterview,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<NewInterviewState, FormData>(createInterview, {});
 
   return (
     <form action={formAction} className="flex max-w-2xl flex-col gap-8">
       <label className="flex flex-col gap-2">
-        <span className="font-medium">Puesto al que aplicas</span>
+        <span className="font-semibold">¿A qué puesto aplicas?</span>
         <input
           name="puesto"
           defaultValue={puesto}
           required
           minLength={3}
           maxLength={120}
-          placeholder="Ej. Desarrollador Frontend React"
-          className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 outline-none focus:border-indigo-500 dark:border-zinc-700"
+          list="ideas-puesto"
+          placeholder="Ej. Desarrollador Frontend Jr"
+          className={`${input} text-lg`}
         />
+        <datalist id="ideas-puesto">
+          {IDEAS.map((i) => (
+            <option key={i} value={i} />
+          ))}
+        </datalist>
       </label>
 
       <label className="flex flex-col gap-2">
-        <span className="font-medium">
-          Descripción de la oferta <span className="font-normal text-zinc-500">(opcional)</span>
+        <span className="font-semibold">
+          La oferta de trabajo <span className="font-normal text-muted">(opcional, pero ayuda mucho)</span>
         </span>
         <textarea
           name="oferta"
           rows={5}
           maxLength={6000}
-          placeholder="Pega aquí la oferta de trabajo. Con ella las preguntas serán más precisas."
-          className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 outline-none focus:border-indigo-500 dark:border-zinc-700"
+          placeholder="Pega aquí la publicación de LinkedIn, Computrabajo o donde la viste. Con ella las preguntas se parecen más a las reales."
+          className={input}
         />
       </label>
 
       <fieldset>
-        <legend className="mb-2 font-medium">Nivel</legend>
+        <legend className="mb-2 font-semibold">Nivel del puesto</legend>
         <div className="grid gap-3 sm:grid-cols-3">
           {LEVELS.map((l) => (
             <label key={l.value} className={optionCard}>
-              <input
-                type="radio"
-                name="level"
-                value={l.value}
-                defaultChecked={(level ?? "junior") === l.value}
-                className="sr-only"
-              />
-              <span className="block font-medium">{l.label}</span>
-              <span className="text-sm text-zinc-500">{l.hint}</span>
+              <input type="radio" name="level" value={l.value} defaultChecked={(level ?? "junior") === l.value} className="sr-only" />
+              <span className="block font-semibold">{l.label}</span>
+              <span className="text-sm text-muted">{l.hint}</span>
             </label>
           ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="mb-2 font-medium">Duración</legend>
+        <legend className="mb-2 font-semibold">¿Cuánto tiempo tienes?</legend>
         <div className="grid gap-3 sm:grid-cols-3">
           {LENGTHS.map((l) => (
             <label key={l.value} className={optionCard}>
-              <input
-                type="radio"
-                name="length"
-                value={l.value}
-                defaultChecked={l.value === "normal"}
-                className="sr-only"
-              />
-              <span className="block font-medium">{l.label}</span>
-              <span className="text-sm text-zinc-500">
-                {l.questions} preguntas · {l.hint}
+              <input type="radio" name="length" value={l.value} defaultChecked={l.value === "normal"} className="sr-only" />
+              <span className="flex items-baseline justify-between">
+                <span className="font-semibold">{l.label}</span>
+                <span className="font-mono text-xs text-muted">{l.hint}</span>
               </span>
+              <span className="text-sm text-muted">{l.questions} preguntas</span>
             </label>
           ))}
         </div>
       </fieldset>
 
       <div className="flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-full bg-indigo-600 px-6 py-2.5 font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
-        >
-          {pending ? "La IA está analizando tu CV…" : "Preparar entrevista"}
+        <button type="submit" disabled={pending} className={`${btnPrimary} py-3 text-base`}>
+          {pending ? "La IA está leyendo tu CV…" : "Preparar mi entrevista →"}
         </button>
-        {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+        {pending && <p className="text-sm text-muted">Tarda unos 20 segundos.</p>}
+        {state.error && <p className="text-sm text-bad">{state.error}</p>}
       </div>
     </form>
   );

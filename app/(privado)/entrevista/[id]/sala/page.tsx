@@ -6,7 +6,7 @@ import { InterviewRoom } from "./InterviewRoom";
 
 export default function SalaPage(props: PageProps<"/entrevista/[id]/sala">) {
   return (
-    <Suspense fallback={<p className="text-zinc-500">Preparando la sala…</p>}>
+    <Suspense fallback={<p className="text-muted">Preparando la sala…</p>}>
       <RoomLoader params={props.params} />
     </Suspense>
   );

@@ -1,17 +1,19 @@
 import { Suspense } from "react";
 import { getProfile } from "@/lib/profile";
+import { eyebrow, pageTitle } from "@/lib/ui";
 import { ProfileForm } from "./ProfileForm";
 
 export default function PerfilPage() {
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold">Tu perfil</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          La IA usa estos datos y tu CV para preparar preguntas a tu medida.
+        <p className={eyebrow}>Paso 1</p>
+        <h1 className={pageTitle}>Tu perfil</h1>
+        <p className="mt-1 max-w-xl text-muted">
+          La IA usa tu CV para preguntarte por tus proyectos, prácticas y experiencia reales. No inventa nada.
         </p>
       </div>
-      <Suspense fallback={<p className="text-zinc-500">Cargando perfil…</p>}>
+      <Suspense fallback={<p className="text-muted">Cargando perfil…</p>}>
         <ProfileLoader />
       </Suspense>
     </section>

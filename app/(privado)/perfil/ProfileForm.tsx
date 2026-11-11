@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { LEVELS, type Level } from "@/lib/levels";
+import { btnPrimary, input, optionCard } from "@/lib/ui";
 import { removeCv, saveProfile, type ProfileState } from "./actions";
 
 type Props = {
@@ -21,34 +22,19 @@ export function ProfileForm({ fullName, level, cvText, updatedAt }: Props) {
     <form action={formAction} className="flex max-w-2xl flex-col gap-8">
       {/* Nombre */}
       <label className="flex flex-col gap-2">
-        <span className="font-medium">Nombre</span>
-        <input
-          name="full_name"
-          defaultValue={fullName}
-          required
-          maxLength={100}
-          className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 outline-none focus:border-indigo-500 dark:border-zinc-700"
-        />
+        <span className="font-semibold">¿Cómo te llamas?</span>
+        <input name="full_name" defaultValue={fullName} required maxLength={100} className={input} />
       </label>
 
       {/* Nivel */}
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 font-medium">Nivel de experiencia</legend>
+        <legend className="mb-2 font-semibold">¿Cuánta experiencia tienes?</legend>
         <div className="grid gap-3 sm:grid-cols-3">
           {LEVELS.map((l) => (
-            <label
-              key={l.value}
-              className="cursor-pointer rounded-xl border border-zinc-300 p-3 transition has-checked:border-indigo-500 has-checked:bg-indigo-50 dark:border-zinc-700 dark:has-checked:bg-indigo-950/40"
-            >
-              <input
-                type="radio"
-                name="level"
-                value={l.value}
-                defaultChecked={level === l.value}
-                className="sr-only"
-              />
-              <span className="block font-medium">{l.label}</span>
-              <span className="text-sm text-zinc-500">{l.hint}</span>
+            <label key={l.value} className={optionCard}>
+              <input type="radio" name="level" value={l.value} defaultChecked={level === l.value} className="sr-only" />
+              <span className="block font-semibold">{l.label}</span>
+              <span className="text-sm text-muted">{l.hint}</span>
             </label>
           ))}
         </div>
@@ -56,38 +42,32 @@ export function ProfileForm({ fullName, level, cvText, updatedAt }: Props) {
 
       {/* CV */}
       <div className="flex flex-col gap-3">
-        <span className="font-medium">Currículum (PDF)</span>
+        <span className="font-semibold">Tu currículum (PDF)</span>
 
         {cvText && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
+          <div className="rounded-3xl border-2 border-ink bg-brand-soft p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm">
-                <span className="font-medium text-emerald-700 dark:text-emerald-400">CV cargado</span>
-                <span className="text-zinc-600 dark:text-zinc-400">
+                <span className="font-semibold">✓ CV cargado</span>
+                <span className="text-muted">
                   {" "}· {words.toLocaleString("es")} palabras
                   {updatedAt && ` · actualizado el ${new Date(updatedAt).toLocaleDateString("es")}`}
                 </span>
               </p>
-              <button
-                formAction={removeCv}
-                formNoValidate
-                className="text-sm text-red-600 hover:underline"
-              >
+              <button formAction={removeCv} formNoValidate className="text-sm font-medium text-bad hover:underline">
                 Quitar CV
               </button>
             </div>
             <details className="mt-2">
-              <summary className="cursor-pointer text-sm text-zinc-600 dark:text-zinc-400">
-                Ver el texto que leerá la IA
-              </summary>
-              <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-white p-3 text-xs dark:bg-zinc-900">
+              <summary className="cursor-pointer text-sm text-muted hover:text-ink">Ver el texto que leerá la IA</summary>
+              <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-2xl bg-surface p-3 font-mono text-xs">
                 {cvText}
               </pre>
             </details>
           </div>
         )}
 
-        <label className="flex cursor-pointer flex-col items-center gap-1 rounded-xl border-2 border-dashed border-zinc-300 px-4 py-8 text-center transition hover:border-indigo-400 dark:border-zinc-700">
+        <label className="dots flex cursor-pointer flex-col items-center gap-2 rounded-3xl border-2 border-dashed border-line bg-surface px-4 py-10 text-center transition hover:border-ink">
           <input
             type="file"
             name="cv"
@@ -95,23 +75,22 @@ export function ProfileForm({ fullName, level, cvText, updatedAt }: Props) {
             className="sr-only"
             onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
           />
-          <span className="font-medium">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink bg-brand text-2xl text-brand-ink shadow-hard-sm" aria-hidden="true">
+            ↑
+          </span>
+          <span className="font-semibold">
             {fileName ?? (cvText ? "Subir otro CV para reemplazarlo" : "Haz clic para elegir tu CV")}
           </span>
-          <span className="text-sm text-zinc-500">PDF con texto, máximo 5 MB</span>
+          <span className="text-sm text-muted">PDF con texto (no escaneado), máximo 5 MB</span>
         </label>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-full bg-indigo-600 px-6 py-2.5 font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
-        >
+      <div className="flex flex-wrap items-center gap-4">
+        <button type="submit" disabled={pending} className={btnPrimary}>
           {pending ? (fileName ? "Leyendo tu CV…" : "Guardando…") : "Guardar perfil"}
         </button>
-        {state.error && <p className="text-sm text-red-600">{state.error}</p>}
-        {state.ok && <p className="text-sm text-emerald-600">{state.message}</p>}
+        {state.error && <p className="text-sm text-bad">{state.error}</p>}
+        {state.ok && <p className="text-sm font-medium text-ok">{state.message}</p>}
       </div>
     </form>
   );

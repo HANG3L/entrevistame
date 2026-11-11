@@ -20,8 +20,9 @@ type Props = {
   resuming: boolean;
 };
 
-const btn = "rounded-full px-4 py-2 text-sm font-medium transition disabled:opacity-50";
-const btnGhost = `${btn} bg-zinc-800 text-zinc-100 hover:bg-zinc-700`;
+const btn = "rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50";
+const btnGhost = `${btn} bg-surface-2 text-ink hover:bg-line`;
+const btnGo = `${btn} border-2 border-ink bg-brand text-brand-ink shadow-hard-sm hover:-translate-y-0.5 active:translate-y-px active:shadow-none`;
 
 export function InterviewRoom(props: Props) {
   const { interviewId, interviewer, puesto, candidateName, avatarUrl, totalQuestions, resuming } = props;
@@ -227,39 +228,40 @@ export function InterviewRoom(props: Props) {
   const inMeeting = phase !== "intro" && phase !== "connecting";
 
   return (
-    <div className="flex flex-col gap-4 rounded-3xl bg-zinc-950 p-3 text-zinc-100 sm:p-5">
+    // La sala siempre es oscura, como una videollamada, sin importar el tema elegido.
+    <div data-theme="dark" className="flex flex-col gap-4 rounded-[2rem] bg-bg p-3 text-ink sm:p-5">
       {/* Barra superior */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-sm">
         <div className="min-w-0">
-          <p className="truncate font-medium">Entrevista · {puesto}</p>
-          <p className="text-zinc-400">{questionLabel}</p>
+          <p className="truncate font-display text-lg font-bold">{puesto}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-muted">{questionLabel}</p>
         </div>
         {inMeeting && phase !== "done" && (
-          <span className="flex items-center gap-2 rounded-full bg-zinc-900 px-3 py-1 tabular-nums">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> {clock}
+          <span className="flex items-center gap-2 rounded-full bg-surface px-3 py-1 font-mono tabular-nums">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-coral" /> {clock}
           </span>
         )}
       </div>
 
       {/* Participantes */}
       <div className="grid gap-3 md:grid-cols-2">
-        <Tile label={`${interviewer} · Entrevistador(a)`} active={phase === "ai"}>
+        <Tile label={`${interviewer} · Entrevistador(a)`} active={phase === "ai"} tone="coral">
           <div className="relative flex items-center justify-center">
-            {phase === "ai" && <span className="absolute h-28 w-28 animate-ping rounded-full bg-indigo-500/30" />}
-            <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-4xl font-semibold">
+            {phase === "ai" && <span className="absolute h-28 w-28 animate-ping rounded-full bg-coral/30" />}
+            <div className="relative flex h-28 w-28 items-center justify-center rounded-full border-2 border-ink bg-coral font-display text-5xl font-extrabold text-[#17140f]">
               {initial(interviewer)}
             </div>
           </div>
-          {phase === "thinking" && <p className="mt-4 animate-pulse text-sm text-zinc-400">Pensando…</p>}
+          {phase === "thinking" && <p className="mt-4 animate-pulse font-mono text-xs uppercase tracking-widest text-muted">Pensando…</p>}
         </Tile>
 
-        <Tile label={`${candidateName} (tú)`} active={phase === "listening" && !typingMode}>
+        <Tile label={`${candidateName} (tú)`} active={phase === "listening" && !typingMode} tone="brand">
           {camStream ? (
             <video ref={videoRef} autoPlay muted playsInline className="absolute inset-0 h-full w-full -scale-x-100 object-cover" />
           ) : (
             <div
-              className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-zinc-700 text-4xl font-semibold transition-shadow"
-              style={{ boxShadow: phase === "listening" ? `0 0 0 ${4 + level * 18}px rgba(16,185,129,0.35)` : undefined }}
+              className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-surface-2 font-display text-5xl font-extrabold transition-shadow"
+              style={{ boxShadow: phase === "listening" ? `0 0 0 ${4 + level * 18}px rgb(200 241 53 / 0.35)` : undefined }}
             >
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -274,11 +276,11 @@ export function InterviewRoom(props: Props) {
 
       {/* Subtítulos */}
       {inMeeting && (
-        <div className="min-h-20 rounded-2xl bg-zinc-900 px-4 py-3 text-center">
+        <div className="min-h-20 rounded-2xl bg-surface px-4 py-3 text-center">
           {phase === "listening" && !typingMode ? (
             <p className="text-lg">
               {stt.transcript}{" "}
-              <span className="text-zinc-500">{stt.interim || (!stt.transcript && "Te escucho… responde cuando quieras.")}</span>
+              <span className="text-muted">{stt.interim || (!stt.transcript && "Te escucho… responde cuando quieras.")}</span>
             </p>
           ) : (
             <p className="text-lg">{current?.say}</p>
@@ -294,14 +296,14 @@ export function InterviewRoom(props: Props) {
           rows={4}
           autoFocus
           placeholder="Escribe tu respuesta…"
-          className="rounded-2xl bg-zinc-900 px-4 py-3 outline-none ring-indigo-500 focus:ring-2"
+          className="rounded-2xl border-2 border-line bg-surface px-4 py-3 outline-none focus:border-brand"
         />
       )}
 
-      {notice && <p className="text-center text-sm text-amber-400">{notice}</p>}
-      {error && <p className="text-center text-sm text-red-400">{error}</p>}
+      {notice && <p className="text-center text-sm text-warn">{notice}</p>}
+      {error && <p className="text-center text-sm text-bad">{error}</p>}
       {sttErrorMessage && (
-        <p className="text-center text-sm text-amber-400">
+        <p className="text-center text-sm text-warn">
           {sttErrorMessage} Mientras tanto puedes responder escribiendo.
         </p>
       )}
@@ -310,12 +312,12 @@ export function InterviewRoom(props: Props) {
       {inMeeting && phase !== "done" && (
         <div className="flex flex-wrap items-center justify-center gap-2">
           {phase === "listening" && (
-            <button onClick={finishAnswer} className={`${btn} bg-emerald-600 px-6 text-white hover:bg-emerald-500`}>
+            <button onClick={finishAnswer} className={`${btnGo} px-6`}>
               {typingMode ? "Enviar respuesta" : "Terminé de responder"}
             </button>
           )}
           {phase === "retry" && pendingAnswer && (
-            <button onClick={() => sendAnswer(pendingAnswer)} className={`${btn} bg-indigo-600 text-white hover:bg-indigo-500`}>
+            <button onClick={() => sendAnswer(pendingAnswer)} className={btnGo}>
               Reintentar
             </button>
           )}
@@ -333,7 +335,7 @@ export function InterviewRoom(props: Props) {
           <button onClick={() => setShowTranscript((s) => !s)} className={btnGhost}>
             {showTranscript ? "Ocultar transcripción" : "Transcripción"}
           </button>
-          <Link href={`/entrevista/${interviewId}`} className={`${btn} bg-red-600/90 text-white hover:bg-red-600`}>
+          <Link href={`/entrevista/${interviewId}`} className={`${btn} bg-bad-soft text-bad hover:bg-bad hover:text-[#17140f]`}>
             Salir
           </Link>
         </div>
@@ -341,9 +343,9 @@ export function InterviewRoom(props: Props) {
 
       {/* Transcripción completa */}
       {showTranscript && lines.length > 0 && (
-        <ol className="flex max-h-72 flex-col gap-2 overflow-auto rounded-2xl bg-zinc-900 p-4 text-sm">
+        <ol className="flex max-h-72 flex-col gap-2 overflow-auto rounded-2xl bg-surface p-4 text-sm">
           {lines.map((l, i) => (
-            <li key={i} className={l.who === "tu" ? "text-emerald-300" : "text-zinc-200"}>
+            <li key={i} className={l.who === "tu" ? "text-brand-text" : "text-ink"}>
               <span className="font-semibold">{l.who === "tu" ? "Tú" : interviewer}:</span> {l.text}
             </li>
           ))}
@@ -352,23 +354,23 @@ export function InterviewRoom(props: Props) {
 
       {/* Antes de entrar */}
       {(phase === "intro" || phase === "connecting") && (
-        <div className="mx-auto flex w-full max-w-lg flex-col gap-4 rounded-2xl bg-zinc-900 p-5">
-          <h2 className="text-lg font-semibold">
-            {resuming ? "Continúa tu entrevista" : `${interviewer} te está esperando`}
+        <div className="mx-auto flex w-full max-w-lg flex-col gap-4 rounded-3xl bg-surface p-5 sm:p-6">
+          <h2 className="text-2xl font-extrabold">
+            {resuming ? "Continúa donde te quedaste" : `${interviewer} te está esperando`}
           </h2>
           {!stt.supported && (
-            <p className="text-sm text-amber-400">
+            <p className="text-sm text-warn">
               Tu navegador no reconoce voz. Puedes responder escribiendo, o abrir la app en Chrome o Edge para hablar.
             </p>
           )}
           {tts.voices.length > 0 ? (
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-zinc-400">Voz del entrevistador</span>
+              <span className="text-muted">Voz del entrevistador</span>
               <div className="flex gap-2">
                 <select
                   value={tts.voice?.voiceURI ?? ""}
                   onChange={(e) => tts.setVoiceURI(e.target.value)}
-                  className="min-w-0 flex-1 rounded-lg bg-zinc-800 px-3 py-2"
+                  className="min-w-0 flex-1 rounded-xl bg-surface-2 px-3 py-2"
                 >
                   {tts.voices.map((v) => (
                     <option key={v.voiceURI} value={v.voiceURI}>
@@ -386,45 +388,45 @@ export function InterviewRoom(props: Props) {
               </div>
             </label>
           ) : (
-            <p className="text-sm text-amber-400">No encontramos voces en español en tu navegador; las preguntas se verán en pantalla.</p>
+            <p className="text-sm text-warn">No encontramos voces en español en tu navegador; las preguntas se verán en pantalla.</p>
           )}
           {stt.supported && (
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-zinc-400">Micrófono</span>
+                <span className="text-muted">Micrófono</span>
                 <button type="button" onClick={toggleMicTest} className={btnGhost}>
                   {testingMic ? "Detener prueba" : "Probar micrófono"}
                 </button>
               </div>
               {testingMic && (
-                <div className="flex flex-col gap-2 rounded-lg bg-zinc-800 p-3">
-                  <div className="h-2 overflow-hidden rounded-full bg-zinc-700">
+                <div className="flex flex-col gap-2 rounded-2xl bg-surface-2 p-3">
+                  <div className="h-2 overflow-hidden rounded-full bg-line">
                     <div
-                      className="h-full rounded-full bg-emerald-500 transition-[width] duration-75"
+                      className="h-full rounded-full bg-brand transition-[width] duration-75"
                       style={{ width: `${Math.round(level * 100)}%` }}
                     />
                   </div>
-                  <p className={stt.transcript || stt.interim ? "" : "text-zinc-500"}>
+                  <p className={stt.transcript || stt.interim ? "" : "text-muted"}>
                     {stt.transcript || stt.interim
                       ? `${stt.transcript} ${stt.interim}`
                       : "Di algo como “Hola, estoy listo para la entrevista”…"}
                   </p>
                   {!stt.listening && !stt.error && (
-                    <p className="text-amber-400">El reconocimiento se detuvo. Pulsa “Detener prueba” y vuelve a probar.</p>
+                    <p className="text-warn">El reconocimiento se detuvo. Pulsa “Detener prueba” y vuelve a probar.</p>
                   )}
                 </div>
               )}
-              {sttErrorMessage && <p className="text-amber-400">{sttErrorMessage}</p>}
+              {sttErrorMessage && <p className="text-warn">{sttErrorMessage}</p>}
             </div>
           )}
-          <ul className="list-disc pl-5 text-sm text-zinc-400">
+          <ul className="list-disc pl-5 text-sm text-muted">
             <li>Cuando termines cada respuesta, pulsa “Terminé de responder”.</li>
             <li>Tu progreso se guarda: si sales, puedes continuar después.</li>
           </ul>
           <button
             onClick={join}
             disabled={phase === "connecting"}
-            className={`${btn} bg-indigo-600 py-3 text-base text-white hover:bg-indigo-500`}
+            className={`${btnGo} py-3 text-base`}
           >
             {phase === "connecting" ? "Conectando…" : resuming ? "Continuar entrevista" : "Unirme a la entrevista"}
           </button>
@@ -433,10 +435,10 @@ export function InterviewRoom(props: Props) {
 
       {/* Final */}
       {phase === "done" && (
-        <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-3 rounded-2xl bg-zinc-900 p-6 text-center">
-          <h2 className="text-lg font-semibold">¡Entrevista terminada!</h2>
-          <p className="text-sm text-zinc-400">Duración: {clock}. Ahora la IA revisará tus respuestas.</p>
-          <Link href={`/resultado/${interviewId}`} className={`${btn} bg-indigo-600 px-6 py-3 text-base text-white hover:bg-indigo-500`}>
+        <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-3 rounded-3xl bg-surface p-6 text-center">
+          <h2 className="text-3xl font-extrabold">¡Lo lograste! 🎉</h2>
+          <p className="text-sm text-muted">Duraste {clock}. Ahora la IA revisará cada respuesta.</p>
+          <Link href={`/resultado/${interviewId}`} className={`${btnGo} px-6 py-3 text-base`}>
             Ver mi feedback
           </Link>
         </div>
@@ -445,15 +447,25 @@ export function InterviewRoom(props: Props) {
   );
 }
 
-function Tile({ label, active, children }: { label: string; active: boolean; children: React.ReactNode }) {
+function Tile({
+  label,
+  active,
+  tone,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  tone: "coral" | "brand";
+  children: React.ReactNode;
+}) {
   return (
     <div
-      className={`relative flex aspect-video flex-col items-center justify-center overflow-hidden rounded-2xl bg-zinc-900 ring-2 transition ${
-        active ? "ring-emerald-500" : "ring-transparent"
+      className={`dots relative flex aspect-video flex-col items-center justify-center overflow-hidden rounded-3xl bg-surface ring-2 transition ${
+        active ? (tone === "coral" ? "ring-coral" : "ring-brand") : "ring-transparent"
       }`}
     >
       {children}
-      <span className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-0.5 text-xs">{label}</span>
+      <span className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2.5 py-0.5 font-mono text-xs text-[#f4efe5]">{label}</span>
     </div>
   );
 }

@@ -60,9 +60,9 @@ export type Turn = {
 // ---------- Feedback (fase 5) ----------
 
 export const VERDICTS = {
-  listo: { label: "Listo para entrevistas", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" },
-  casi: { label: "Casi listo", className: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" },
-  practicar: { label: "Necesita más práctica", className: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300" },
+  listo: { label: "Listo para entrevistas", headline: "Vas con todo.", className: "bg-ok-soft text-ok" },
+  casi: { label: "Casi listo", headline: "Estás muy cerca.", className: "bg-warn-soft text-warn" },
+  practicar: { label: "Necesita más práctica", headline: "Buen comienzo. A seguir practicando.", className: "bg-bad-soft text-bad" },
 } as const;
 
 export type Verdict = keyof typeof VERDICTS;
