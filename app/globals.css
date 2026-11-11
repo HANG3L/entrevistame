@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/* El modo oscuro lo decide el atributo data-theme (ver ThemeScript en app/layout.tsx). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------- Paleta ----------
+   Papel cálido + tinta, con lima eléctrica para lo tuyo y coral para el entrevistador. */
+:root,
+[data-theme="light"] {
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --surface-2: #ece6d9;
+  --ink: #17140f;
+  --muted: #6b6457;
+  --line: #ddd5c4;
+
+  --brand: #c8f135; /* lima: botones y resaltados (siempre con texto oscuro) */
+  --brand-ink: #17140f;
+  --brand-text: #4a6400; /* lima legible como texto sobre papel */
+  --brand-soft: #eaf8c0;
+
+  --coral: #ff6b4a;
+  --coral-text: #c8401f;
+  --coral-soft: #ffe1d8;
+
+  --ok: #1f7a3d;
+  --ok-soft: #dcf3e2;
+  --warn: #a35c00;
+  --warn-soft: #fbecd2;
+  --bad: #b42318;
+  --bad-soft: #fde2df;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #12110f;
+  --surface: #1b1916;
+  --surface-2: #26231f;
+  --ink: #f4efe5;
+  --muted: #a39b8c;
+  --line: #322e28;
+
+  --brand: #c8f135;
+  --brand-ink: #17140f;
+  --brand-text: #c8f135;
+  --brand-soft: rgb(200 241 53 / 0.12);
+
+  --coral: #ff6b4a;
+  --coral-text: #ff8d72;
+  --coral-soft: rgb(255 107 74 / 0.14);
+
+  --ok: #5ddc85;
+  --ok-soft: rgb(93 220 133 / 0.12);
+  --warn: #f5b94a;
+  --warn-soft: rgb(245 185 74 / 0.12);
+  --bad: #ff7b6e;
+  --bad-soft: rgb(255 123 110 / 0.12);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-text: var(--brand-text);
+  --color-brand-soft: var(--brand-soft);
+  --color-coral: var(--coral);
+  --color-coral-text: var(--coral-text);
+  --color-coral-soft: var(--coral-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-bricolage);
+}
+
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--brand);
+    color: var(--brand-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--coral);
+    outline-offset: 2px;
+  }
+}
+
+/* Subrayado de marcador para resaltar palabras clave. */
+@utility marker {
+  background-image: linear-gradient(transparent 58%, var(--brand) 58%, var(--brand) 92%, transparent 92%);
+  padding-inline: 0.1em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* En oscuro el texto claro no se lee sobre lima: el resaltado cubre toda la palabra. */
+[data-theme="dark"] .marker {
+  background-image: linear-gradient(var(--brand), var(--brand));
+  color: var(--brand-ink);
+  border-radius: 0.12em;
+}
+
+/* Sombra "sticker": desplazada y sin difuminar. */
+@utility shadow-hard {
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+@utility shadow-hard-sm {
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+/* Fondo de puntitos para las zonas destacadas. */
+@utility dots {
+  background-image: radial-gradient(color-mix(in oklab, var(--ink) 14%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
